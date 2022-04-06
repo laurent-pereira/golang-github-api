@@ -13,7 +13,38 @@ Utilisation du `sync.WaitGroup{}` pour paralléliser les call APIs. Le temps de 
 Utilisation d'un "In Memory Cache System" pour stocker les "Items" (Redis ou autre). De cette manière, on peut mutualiser les résultats entre les utilisateurs et limiter fortement les calls d'API
 [https://adityarama1210.medium.com/fast-golang-api-performance-with-in-memory-key-value-storing-cache-1b248c182bdb](https://adityarama1210.medium.com/fast-golang-api-performance-with-in-memory-key-value-storing-cache-1b248c182bdb)
 
-A tester ce soir...
+~~A tester ce soir...~~
+
+````console
+curl -XPOST http://localhost:5000/repos -H 'Content-Type: application/json' -d '{"License": "mit", "Owner": "scalingo"}'
+````
+
+#### Test 1
+
+````console
+# No cache
+fechLastRepositories Execution Time:  1.731305084s
+
+# After Cache
+fechLastRepositories Execution Time:  1.016486125s
+````
+#### Test 2
+
+````console
+curl -XPOST http://localhost:5000/repos -H 'Content-Type: application/json' -d '{"owner": "laurent-pereira"}'
+````
+
+````console
+# No cache
+fechLastRepositories Execution Time: 710.947667ms
+
+# After Cache
+fechLastRepositories Execution Time: 566.361584ms
+````
+
+Nice :+1:
+
+@Todo : Utiliser Redis pour avoir un cache mutualisé entre les différents utilisateurs.
 
 ## Maintenabilité dans le temps
 ### Tests
