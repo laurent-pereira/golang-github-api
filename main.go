@@ -29,12 +29,6 @@ type Item struct {
 	Languages			 map[string]int
 }
 
-// Language is the single language data structure
-type Language struct {
-	Language string
-	Bytes int
-}
-
 // Stats contains the Stats data structure
 type Stats struct {
 	Languages map[string]int
