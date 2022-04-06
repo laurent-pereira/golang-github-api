@@ -11,6 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/Scalingo/go-handlers"
 	"github.com/Scalingo/go-utils/logger"
+	"github.com/patrickmn/go-cache"
 )
 
 // Item is the single repository data structure
@@ -53,6 +54,8 @@ type Filters struct {
 	Repository string
 }
 
+var ItemCache CacheItf
+
 func main() {
 	log := logger.Default()
 	
@@ -66,7 +69,8 @@ func main() {
 	}
 
 	log.Info("Initializing app")
-	
+	InitCache() // Initialize the cache
+
 	cfg, err := NewConfig()
 	if err != nil {
 		log.WithError(err).Error("Fail to initialize configuration")
@@ -81,6 +85,45 @@ func main() {
 
 	log.WithField("port", cfg.Port).Info("Listening...")
 	http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), router)
+}
+
+type CacheItf interface {
+	Set(key string, data interface{}, expiration time.Duration) error
+	Get(key string) ([]byte, error)
+}
+
+type AppCache struct {
+	client *cache.Cache
+}
+
+func InitCache() {
+	ItemCache = &AppCache{
+		client: cache.New(5*time.Minute, 10*time.Minute),
+	}
+}
+
+func (r *AppCache) Set(key string, data interface{}, expiration time.Duration) error {
+	b, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	r.client.Set(key, b, expiration)
+	return nil
+}
+
+func (r *AppCache) Get(key string) ([]byte, error) {
+	res, exist := r.client.Get(key)
+	if !exist {
+		return nil, nil
+	}
+
+	resByte, ok := res.([]byte)
+	if !ok {
+		return nil, nil
+	}
+
+	return resByte, nil
 }
 
 /*
@@ -109,6 +152,7 @@ func setFilters(filters Filters) (string) {
 	https://docs.github.com/en/rest/reference/repos#list-public-repositories
 */
 func fechLastRepositories(params Filters) (JSONData) {
+	log := logger.Default()
 	// Execution time of the function
 	start := time.Now()
 	defer func() {
@@ -116,7 +160,7 @@ func fechLastRepositories(params Filters) (JSONData) {
 	}()
 	
 	query := setFilters(params)
-	var url = fmt.Sprintf("https://api.github.com/search/repositories?q=%s&sort=updated&order=desc&per_page=100", query)
+	var url = fmt.Sprintf("https://api.github.com/search/repositories?q=%s&sort=updated&order=desc&per_page=50", query)
 
 	req, err := http.NewRequest("GET", url, nil)
 	req.Header.Add("Authorization", "Bearer " + os.Getenv("GITHUB_TOKEN"))
@@ -145,7 +189,17 @@ func fechLastRepositories(params Filters) (JSONData) {
 	for index, repository := range data.Items {
 		wg.Add(1)
 		go func(repository Item, index int) {
-			data.Items[index].Languages = fetchLanguages(map[string]string{"languages_url": repository.LanguagesUrl})
+			if res, _ := ItemCache.Get(repository.FullName); res != nil {
+				log.Info("Cache hit for ", repository.FullName)
+				item := Item{}
+				json.Unmarshal(res, &item)
+				data.Items[index] = item
+			} else {
+				// Get the languages for the repository
+				log.Info("API Call for ", repository.FullName)
+				data.Items[index].Languages = fetchLanguages(map[string]string{"languages_url": repository.LanguagesUrl})
+				ItemCache.Set(repository.FullName, data.Items[index], cache.DefaultExpiration)
+			}
 			wg.Done()
 		}(repository, index)
 	}
