@@ -58,8 +58,13 @@ func main() {
 	
 	err := godotenv.Load(".env")
 	if err != nil {
-			log.Fatal("Error loading .env file")
+		panic("Error loading .env file")
 	}
+
+	if os.Getenv("GITHUB_TOKEN") == "" {
+		panic("GITHUB_TOKEN is not set")
+	}
+
 	log.Info("Initializing app")
 	
 	cfg, err := NewConfig()
