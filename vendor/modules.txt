@@ -1,0 +1,37 @@
+# github.com/Scalingo/go-handlers v1.4.2
+## explicit
+github.com/Scalingo/go-handlers
+# github.com/Scalingo/go-utils/errors v1.1.0
+github.com/Scalingo/go-utils/errors
+# github.com/Scalingo/go-utils/logger v1.1.0
+## explicit
+github.com/Scalingo/go-utils/logger
+# github.com/gofrs/uuid v4.2.0+incompatible
+github.com/gofrs/uuid
+# github.com/google/go-cmp v0.5.7
+## explicit
+# github.com/gorilla/mux v1.8.0
+github.com/gorilla/mux
+# github.com/joho/godotenv v1.4.0
+## explicit
+github.com/joho/godotenv
+# github.com/kelseyhightower/envconfig v1.4.0
+## explicit
+github.com/kelseyhightower/envconfig
+# github.com/patrickmn/go-cache v2.1.0+incompatible
+## explicit
+github.com/patrickmn/go-cache
+# github.com/pkg/errors v0.9.1
+## explicit
+github.com/pkg/errors
+# github.com/sirupsen/logrus v1.8.1
+github.com/sirupsen/logrus
+# github.com/urfave/negroni v1.0.0
+github.com/urfave/negroni
+# golang.org/x/sys v0.0.0-20210615035016-665e8c7367d1
+## explicit
+golang.org/x/sys/internal/unsafeheader
+golang.org/x/sys/unix
+golang.org/x/sys/windows
+# gopkg.in/errgo.v1 v1.0.1
+gopkg.in/errgo.v1
