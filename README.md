@@ -128,7 +128,7 @@ curl -XPOST http://localhost:5000/stats -H 'Content-Type: application/json' -d '
 }
 ````
 
-### Get last languages used with "Python"
+### Get languages used with "Python" (100 lasts repositories limitation)
 ````console
  curl -XPOST http://localhost:5000/stats -H 'Content-Type: application/json' -d '{"Language": "Python"}'
 ````
