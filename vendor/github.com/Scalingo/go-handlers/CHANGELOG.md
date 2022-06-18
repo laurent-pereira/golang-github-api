@@ -1,5 +1,16 @@
 # Changelog
 
+## To be Released
+
+## v1.4.4
+
+* chore(go): use go 1.17
+* Bump github.com/stretchr/testify from 1.7.0 to 1.7.1
+
+## v1.4.3
+
+* feat(error_middleware): log and error for all 5xx status code
+
 ## v1.4.2
 
 * fix(error_middleware): better detection of JSON Content-Type
